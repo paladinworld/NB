@@ -1,0 +1,120 @@
+# RVI portfolio inputs. Edit this file as new information becomes available.
+# Sources to check each quarter:
+#   - Fund factsheet / "What's in this fund" tab in Robinhood
+#   - SEC filings (N-PORT, N-CSR) — https://www.sec.gov/cgi-bin/browse-edgar
+#   - Prospectus and semi-annual reports
+#   - Secondary market signals: Forge Global, EquityZen, Hiive
+#   - Last primary funding round: TechCrunch, PitchBook, company press releases
+
+fund:
+  ticker: RVI
+  name: Robinhood Ventures Fund I
+  inception_date: 2026-03-06
+
+  # ---- Capital structure ----
+  # Verify against latest 10-Q / N-CSR. The IPO raised $314.35M (per factsheet);
+  # closed-end fund IPOs typically price at $25/share, implying ~12.574M shares.
+  ipo_raise_M: 314.35
+  ipo_price: 25.00              # VERIFY from prospectus
+  shares_outstanding_M: 12.574  # VERIFY: ipo_raise_M / ipo_price, or filings
+
+  # ---- Market price (update when running) ----
+  market_price: 45.70
+  price_as_of: 2026-05-19
+
+  # ---- Cash & liabilities ($M) ----
+  # As of Jan 31, 2026 the factsheet noted that next-quarter the $314.35M IPO raise
+  # will be reflected across cash + new investments. Update as deployment proceeds.
+  cash_and_equivalents_M: 314.35
+  other_liabilities_M: 0
+  accrued_mgmt_fee_M: 0
+
+  # ---- Fees ----
+  management_fee_pct: 2.00      # VERIFY from prospectus (closed-end funds: typically 1.5–2.5%)
+
+# ---- Blending weights ----
+# How much to weight each valuation method when computing blended fair value
+# for each private holding. Must sum to 1.0.
+#   - last_round:  most conservative; stale if round was >6mo old
+#   - secondary:   best signal when active; uses last_round × (1 + secondary_premium)
+#   - public_comp: cross-check via revenue × public peer multiple, illiquidity-discounted
+valuation_weights:
+  last_round: 0.30
+  secondary: 0.45
+  public_comp: 0.25
+
+# ---- Holdings (10 per factsheet) ----
+# Only Databricks is confirmed from the in-app screenshot (23.24% as of Jan 31, 2026).
+# Fill in the remaining nine from RVI's published holdings disclosure.
+#
+# Per-holding fields:
+#   weight_pct                — % of portfolio NAV reported by the fund
+#   fund_mark_M               — $M reported by fund (from N-PORT). Optional but useful.
+#   rvi_ownership_pct         — RVI's % of the company's fully-diluted shares (very small;
+#                               often well under 1%). Compute from $stake / company FMV.
+#   last_round_valuation_B    — most recent primary round, post-money, $B
+#   last_round_date           — YYYY-MM-DD
+#   secondary_premium_pct     — observed Forge/EquityZen mark vs last round (+ for premium)
+#   illiquidity_discount_pct  — applied to all independent estimates (15–30% typical)
+#   public_comp_ev_to_revenue — NTM EV/Revenue multiple of public peers
+#   company_revenue_ttm_B     — company's most recently reported / leaked TTM revenue, $B
+#   notes                     — any context worth preserving for future review
+
+holdings:
+  - name: Databricks
+    weight_pct: 23.24
+    fund_mark_M: null
+    rvi_ownership_pct: null
+    last_round_valuation_B: 62.0          # Series J, Dec 2024 — UPDATE if a newer round
+    last_round_date: 2024-12-17
+    secondary_premium_pct: 35             # ballpark from late-2025 secondaries; VERIFY
+    illiquidity_discount_pct: 15
+    public_comp_ev_to_revenue: 16         # blend of SNOW / MDB / NET NTM EV/Rev; VERIFY
+    company_revenue_ttm_B: 3.0            # reported ARR approaching $3.5B in late 2025; VERIFY
+    notes: |
+      Largest position. AI/data platform. IPO filing speculated for 2026 — watch for S-1.
+      If DB IPOs, premium-to-NAV likely compresses as the position re-marks to public price.
+
+  - name: HOLDING_2_FILL_IN
+    weight_pct: null
+    fund_mark_M: null
+    rvi_ownership_pct: null
+    last_round_valuation_B: null
+    last_round_date: null
+    secondary_premium_pct: 0
+    illiquidity_discount_pct: 20
+    public_comp_ev_to_revenue: null
+    company_revenue_ttm_B: null
+    notes: ""
+
+  - name: HOLDING_3_FILL_IN
+    weight_pct: null
+    illiquidity_discount_pct: 20
+
+  - name: HOLDING_4_FILL_IN
+    weight_pct: null
+    illiquidity_discount_pct: 20
+
+  - name: HOLDING_5_FILL_IN
+    weight_pct: null
+    illiquidity_discount_pct: 20
+
+  - name: HOLDING_6_FILL_IN
+    weight_pct: null
+    illiquidity_discount_pct: 20
+
+  - name: HOLDING_7_FILL_IN
+    weight_pct: null
+    illiquidity_discount_pct: 20
+
+  - name: HOLDING_8_FILL_IN
+    weight_pct: null
+    illiquidity_discount_pct: 20
+
+  - name: HOLDING_9_FILL_IN
+    weight_pct: null
+    illiquidity_discount_pct: 20
+
+  - name: HOLDING_10_FILL_IN
+    weight_pct: null
+    illiquidity_discount_pct: 20
