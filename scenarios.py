@@ -31,20 +31,24 @@ def main():
     print(f"Base premium/discount:      {(px-base_nav_ps)/base_nav_ps*100:+.2f}%\n")
 
     scenarios = [
-        # User's question, mapped to actual holdings:
-        ("Databricks +25% (analog: OpenAI $800B→$1T)",
-            {"Databricks": 1.25}),
-        ("All fintechs +30% (Revolut + Airwallex + Ramp)",
-            {"Revolut": 1.30, "Airwallex": 1.30, "Ramp": 1.30}),
-        ("Both: DB +25% AND fintechs +30%",
-            {"Databricks": 1.25, "Revolut": 1.30, "Airwallex": 1.30, "Ramp": 1.30}),
-        # Stress scenarios:
-        ("Bull: every holding +40%",
+        # User's questions, against the actual holdings:
+        ("OpenAI $852B → $1T (+17%)",
+            {"OpenAI": 1.17}),
+        ("Stripe +30% from investment round",
+            {"Stripe": 1.30}),
+        ("Both: OpenAI +17% AND Stripe +30%",
+            {"OpenAI": 1.17, "Stripe": 1.30}),
+        ("OpenAI $852B → $1.2T (+41%)",
+            {"OpenAI": 1.41}),
+        # Other bull / bear scenarios:
+        ("Databricks IPO pop (+50%)",
+            {"Databricks": 1.50}),
+        ("All fintechs +30% (Revolut + Airwallex + Ramp + Stripe)",
+            {"Revolut": 1.30, "Airwallex": 1.30, "Ramp": 1.30, "Stripe": 1.30}),
+        ("Bull: every private holding +40%",
             {h.name: 1.40 for h in fund.holdings}),
-        ("Bear: every holding -25%",
+        ("Bear: every private holding −25%",
             {h.name: 0.75 for h in fund.holdings}),
-        ("Databricks doubles (IPO pop)",
-            {"Databricks": 2.0}),
         ("Mercor 10x (AI-leader narrative)",
             {"Mercor": 10.0}),
     ]

@@ -32,7 +32,13 @@ fund:
   # ---- Cash & liabilities ($M) ----
   # If null, computed as (cash_weight_in_sleeve × pre_ipo_sleeve_M) + ipo_raise_M.
   # Override with the actual figure if you have it from a 10-Q.
-  cash_and_equivalents_M: null
+  # Post-IPO deployments (subtract from cash):
+  #   Stripe       $14.58M   2026-03-09  Class B Common, secondary
+  #   ElevenLabs   $20.00M   2026-03-12  Series D Preferred, primary
+  #   OpenAI       $75.00M   2026-04-17  Common stock
+  #   Total        $109.58M
+  # Cash = 0.1978 × 260 + 314.35 − 109.58 = 51.43 + 314.35 − 109.58 = 256.20
+  cash_and_equivalents_M: 256.20
   other_liabilities_M: 0
   accrued_mgmt_fee_M: 0
 
@@ -146,3 +152,48 @@ holdings:
     notes: |
       Corporate spend management. Very high growth rate justifies premium
       multiple vs public peers. IPO candidate 2026-2027.
+
+  # ---- Post-IPO additions (not in Jan 31 weights) ----
+  # These have explicit fund_mark_M (the announced investment amount), so
+  # weight_pct is null — they were added after the Jan 31 snapshot.
+
+  - name: OpenAI
+    weight_pct: null
+    fund_mark_M: 75.00                      # $75M common stock, Apr 17, 2026
+    last_round_valuation_B: 852.0           # post-$122B round, early 2026
+    last_round_date: 2026-01-15
+    secondary_premium_pct: 0                # just bought near current mark
+    illiquidity_discount_pct: 10
+    public_comp_ev_to_revenue: 45           # AI premium; speculative
+    company_revenue_ttm_B: 15.0             # ~$15B run rate late 2025 — VERIFY
+    notes: |
+      $75M common stock purchase, April 17, 2026 (announced April 22).
+      Implies ~0.0088% ownership of OpenAI at $852B post-money. One of
+      the few retail vehicles for direct OpenAI exposure.
+
+  - name: Stripe
+    weight_pct: null
+    fund_mark_M: 14.58                      # Mar 9, 2026, Class B Common
+    last_round_valuation_B: 159.0           # Feb 2026 tender at $159B
+    last_round_date: 2026-02-24
+    secondary_premium_pct: 5
+    illiquidity_discount_pct: 15
+    public_comp_ev_to_revenue: 12           # PYPL/ADYEN/SQ blend + premium
+    company_revenue_ttm_B: 5.0              # est. from $1.9T TPV × take rate
+    notes: |
+      $14.58M Class B Common March 9, 2026 — secondary purchase.
+      Stripe TPV $1.9T (+34% YoY); revenue suite $1B ARR. Collison says no
+      imminent IPO. Implies ~0.0092% ownership at $159B.
+
+  - name: ElevenLabs
+    weight_pct: null
+    fund_mark_M: 20.00                      # Mar 12, 2026, Series D Preferred
+    last_round_valuation_B: 11.0            # Series D Feb 4, 2026 at $11B
+    last_round_date: 2026-02-04
+    secondary_premium_pct: 10
+    illiquidity_discount_pct: 15
+    public_comp_ev_to_revenue: 30           # AI audio premium
+    company_revenue_ttm_B: 0.27             # ~$200M ARR end-2025, growing
+    notes: |
+      $20M Series D Preferred primary March 12, 2026. AI voice generation.
+      Series D led by Sequoia at $11B post-money. ~0.18% ownership.
