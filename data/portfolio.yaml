@@ -18,103 +18,131 @@ fund:
   ipo_price: 25.00              # VERIFY from prospectus
   shares_outstanding_M: 12.574  # VERIFY: ipo_raise_M / ipo_price, or filings
 
-  # ---- Market price (update when running) ----
+  # ---- Market price ----
   market_price: 45.70
   price_as_of: 2026-05-19
 
+  # ---- Pre-IPO sleeve size ($M) ----
+  # Total NAV of the Jan 31, 2026 sleeve (holdings + cash, before the IPO raise).
+  # The fund's factsheet shows percent weights as of Jan 31, but not the $ total.
+  # Look in the prospectus / S-1 (Statement of Investments) or first 10-Q.
+  # Plausible range $150-350M based on closed-end fund seed-stage sizing.
+  pre_ipo_sleeve_M: 260.0       # ASSUMPTION — VERIFY from prospectus
+
   # ---- Cash & liabilities ($M) ----
-  # As of Jan 31, 2026 the factsheet noted that next-quarter the $314.35M IPO raise
-  # will be reflected across cash + new investments. Update as deployment proceeds.
-  cash_and_equivalents_M: 314.35
+  # If null, computed as (cash_weight_in_sleeve × pre_ipo_sleeve_M) + ipo_raise_M.
+  # Override with the actual figure if you have it from a 10-Q.
+  cash_and_equivalents_M: null
   other_liabilities_M: 0
   accrued_mgmt_fee_M: 0
 
   # ---- Fees ----
-  management_fee_pct: 2.00      # VERIFY from prospectus (closed-end funds: typically 1.5–2.5%)
+  management_fee_pct: 2.00      # VERIFY from prospectus
 
 # ---- Blending weights ----
 # How much to weight each valuation method when computing blended fair value
 # for each private holding. Must sum to 1.0.
-#   - last_round:  most conservative; stale if round was >6mo old
-#   - secondary:   best signal when active; uses last_round × (1 + secondary_premium)
-#   - public_comp: cross-check via revenue × public peer multiple, illiquidity-discounted
 valuation_weights:
   last_round: 0.30
   secondary: 0.45
   public_comp: 0.25
 
-# ---- Holdings (10 per factsheet) ----
-# Only Databricks is confirmed from the in-app screenshot (23.24% as of Jan 31, 2026).
-# Fill in the remaining nine from RVI's published holdings disclosure.
-#
+# ---- Holdings ----
 # Per-holding fields:
-#   weight_pct                — % of portfolio NAV reported by the fund
-#   fund_mark_M               — $M reported by fund (from N-PORT). Optional but useful.
-#   rvi_ownership_pct         — RVI's % of the company's fully-diluted shares (very small;
-#                               often well under 1%). Compute from $stake / company FMV.
+#   weight_pct                — % of pre-IPO sleeve NAV (from factsheet)
+#   fund_mark_M               — $M reported by fund. If null, auto-computed
+#                               from weight_pct × pre_ipo_sleeve_M.
+#   rvi_ownership_pct         — RVI's % of company FDS. If null, auto-computed
+#                               from fund_mark_M / (last_round_valuation_B × 1000).
 #   last_round_valuation_B    — most recent primary round, post-money, $B
 #   last_round_date           — YYYY-MM-DD
-#   secondary_premium_pct     — observed Forge/EquityZen mark vs last round (+ for premium)
-#   illiquidity_discount_pct  — applied to all independent estimates (15–30% typical)
+#   secondary_premium_pct     — secondary market mark vs last round (+ for premium)
+#   illiquidity_discount_pct  — applied to secondary & public-comp estimates
 #   public_comp_ev_to_revenue — NTM EV/Revenue multiple of public peers
-#   company_revenue_ttm_B     — company's most recently reported / leaked TTM revenue, $B
-#   notes                     — any context worth preserving for future review
+#   company_revenue_ttm_B     — company TTM revenue, $B
+#   notes                     — context worth preserving
 
 holdings:
   - name: Databricks
     weight_pct: 23.24
-    fund_mark_M: null
-    rvi_ownership_pct: null
-    last_round_valuation_B: 62.0          # Series J, Dec 2024 — UPDATE if a newer round
+    last_round_valuation_B: 62.0            # Series J Dec 2024 — VERIFY for newer rounds
     last_round_date: 2024-12-17
-    secondary_premium_pct: 35             # ballpark from late-2025 secondaries; VERIFY
-    illiquidity_discount_pct: 15
-    public_comp_ev_to_revenue: 16         # blend of SNOW / MDB / NET NTM EV/Rev; VERIFY
-    company_revenue_ttm_B: 3.0            # reported ARR approaching $3.5B in late 2025; VERIFY
+    secondary_premium_pct: 25               # late-2025 secondaries ~$75-85B implied — VERIFY
+    illiquidity_discount_pct: 10            # very liquid secondary market for DB
+    public_comp_ev_to_revenue: 20           # SNOW/MDB/NET NTM EV/Rev with AI premium
+    company_revenue_ttm_B: 3.5              # ARR approaching $3.5B late 2025 — VERIFY
     notes: |
-      Largest position. AI/data platform. IPO filing speculated for 2026 — watch for S-1.
-      If DB IPOs, premium-to-NAV likely compresses as the position re-marks to public price.
+      AI/data platform, largest position. IPO speculated for 2026.
+      A real DB IPO would force a re-mark and likely compress RVI's premium.
 
-  - name: HOLDING_2_FILL_IN
-    weight_pct: null
-    fund_mark_M: null
-    rvi_ownership_pct: null
-    last_round_valuation_B: null
-    last_round_date: null
-    secondary_premium_pct: 0
-    illiquidity_discount_pct: 20
-    public_comp_ev_to_revenue: null
+  - name: Revolut
+    weight_pct: 14.30
+    last_round_valuation_B: 45.0            # Aug 2024 employee tender — VERIFY
+    last_round_date: 2024-08-16
+    secondary_premium_pct: 15
+    illiquidity_discount_pct: 15
+    public_comp_ev_to_revenue: 7            # HOOD/NU/SOFI blend
+    company_revenue_ttm_B: 2.4              # FY24 ~$2.2-2.5B reported — VERIFY
+    notes: |
+      Profitable neobank, EU + global. Profitability supports higher multiple
+      than typical neobank peers. UK IPO filing has been rumored.
+
+  - name: Mercor
+    weight_pct: 14.23
+    last_round_valuation_B: 2.0             # mid-2024 round — HIGHLY UNCERTAIN, may be stale
+    last_round_date: 2024-09-15
+    secondary_premium_pct: 50               # hot AI-adjacent name; guess
+    illiquidity_discount_pct: 25
+    public_comp_ev_to_revenue: 30           # AI premium; speculative
+    company_revenue_ttm_B: 0.1              # revenue undisclosed; placeholder
+    notes: |
+      AI talent / contractor platform. Has likely raised again in 2025 at much
+      higher valuation. ALL inputs here are speculative — this is the lowest-
+      confidence holding in the model. Look for a primary funding round update.
+
+  - name: Airwallex
+    weight_pct: 7.11
+    last_round_valuation_B: 5.6             # Series F1 May 2024 — VERIFY
+    last_round_date: 2024-05-21
+    secondary_premium_pct: 20
+    illiquidity_discount_pct: 15
+    public_comp_ev_to_revenue: 8            # ADYEN/FOUR/AFRM blend
+    company_revenue_ttm_B: 0.8              # est ~$700-900M — VERIFY
+    notes: |
+      Cross-border B2B payments. APAC + EU strength. IPO candidate.
+
+  - name: Boom Supersonic
+    weight_pct: 7.11
+    last_round_valuation_B: 3.5             # ~early 2024 — VERIFY
+    last_round_date: 2024-02-15
+    secondary_premium_pct: 0                # no liquid secondary market
+    illiquidity_discount_pct: 30            # pre-revenue, milestone risk
+    public_comp_ev_to_revenue: null         # not applicable — pre-revenue
     company_revenue_ttm_B: null
-    notes: ""
+    notes: |
+      Pre-revenue aerospace. XB-1 demonstrator achieved supersonic flight in
+      Jan 2025. Commercial Overture jets still years out. Speculative; valuation
+      depends entirely on milestone progress. Last-round method dominates here.
 
-  - name: HOLDING_3_FILL_IN
-    weight_pct: null
+  - name: Oura
+    weight_pct: 7.11
+    last_round_valuation_B: 5.0             # ~Dec 2024 per press reports — VERIFY
+    last_round_date: 2024-12-10
+    secondary_premium_pct: 10
     illiquidity_discount_pct: 20
+    public_comp_ev_to_revenue: 5            # consumer hardware + subscription
+    company_revenue_ttm_B: 0.55             # ~$500-600M reported — VERIFY
+    notes: |
+      Smart-ring wearable with subscription. Strong brand; recurring revenue.
 
-  - name: HOLDING_4_FILL_IN
-    weight_pct: null
-    illiquidity_discount_pct: 20
-
-  - name: HOLDING_5_FILL_IN
-    weight_pct: null
-    illiquidity_discount_pct: 20
-
-  - name: HOLDING_6_FILL_IN
-    weight_pct: null
-    illiquidity_discount_pct: 20
-
-  - name: HOLDING_7_FILL_IN
-    weight_pct: null
-    illiquidity_discount_pct: 20
-
-  - name: HOLDING_8_FILL_IN
-    weight_pct: null
-    illiquidity_discount_pct: 20
-
-  - name: HOLDING_9_FILL_IN
-    weight_pct: null
-    illiquidity_discount_pct: 20
-
-  - name: HOLDING_10_FILL_IN
-    weight_pct: null
-    illiquidity_discount_pct: 20
+  - name: Ramp
+    weight_pct: 7.11
+    last_round_valuation_B: 13.0            # Series E ~April 2025 — VERIFY
+    last_round_date: 2025-04-15
+    secondary_premium_pct: 10
+    illiquidity_discount_pct: 15
+    public_comp_ev_to_revenue: 10           # BILL/TOST blend, growth premium
+    company_revenue_ttm_B: 0.7              # ARR ~$700M — VERIFY
+    notes: |
+      Corporate spend management. Very high growth rate justifies premium
+      multiple vs public peers. IPO candidate 2026-2027.

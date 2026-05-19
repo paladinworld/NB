@@ -88,23 +88,36 @@ over time. Use `--no-log` to skip.
 
 ## Filling in inputs
 
-Start with `data/portfolio.yaml`. The fund-level block (shares, cash, fees)
-should come straight from filings. For each holding you need three pieces to
-get *any* independent estimate:
+Start with `data/portfolio.yaml`. The fund-level block needs:
 
-1. **`rvi_ownership_pct`** — RVI's % of the company's fully-diluted shares.
-   Compute as `fund_mark_M / (company_FMV_M)`. If the fund discloses a $ stake
-   in N-PORT, that plus the company's last-round valuation gives you this.
+- **`shares_outstanding_M`** — from latest 10-Q (most important; market cap
+  scales linearly).
+- **`pre_ipo_sleeve_M`** — total $M of the Jan 31, 2026 holdings + cash
+  (before the IPO raise). Single most important assumption: the model uses
+  it to back out each holding's $ stake from the reported `weight_pct`.
+- **`market_price`** — current quote.
+- **`cash_and_equivalents_M`** — leave `null` to auto-compute from sleeve
+  cash + IPO raise, or override with the actual 10-Q figure.
+
+For each holding, the cleanest path is:
+
+1. **`weight_pct`** — from the factsheet.
 2. **`last_round_valuation_B`** — most recent primary round, post-money.
-3. **At least one of**: `secondary_premium_pct` (if you have current secondary
+3. **One of**: `secondary_premium_pct` (if you have current Forge/EquityZen
    data) or `public_comp_ev_to_revenue` + `company_revenue_ttm_B`.
 
-If you only have `fund_mark_M` and `weight_pct`, the model still works — it
-will just rely on fund marks rather than producing an independent estimate for
-that holding.
+The model auto-derives:
 
-Only **Databricks** is pre-filled (from the in-app screenshot, 23.24% as of
-Jan 31, 2026). Fill the other nine from the fund's published holdings list.
+- `fund_mark_M` = `weight_pct × pre_ipo_sleeve_M / 100`
+- `rvi_ownership_pct` = `fund_mark_M / (last_round_valuation_B × 1000)`
+
+If the fund discloses an actual $ stake (from N-PORT), enter it in
+`fund_mark_M` directly — that overrides the auto-derivation.
+
+The current YAML is **pre-populated with my best estimates for all 7 named
+holdings** (Databricks, Revolut, Mercor, Airwallex, Boom Supersonic, Oura,
+Ramp) — but every numeric field is marked VERIFY because primary-round
+dates/valuations move. Treat the output as a starting framework, not gospel.
 
 ### Where to find the inputs
 

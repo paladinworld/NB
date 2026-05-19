@@ -179,16 +179,45 @@ def load_fund(path: str) -> Fund:
     fund_data = raw["fund"]
     weights = raw.get("valuation_weights", {})
     holdings = [_holding_from_dict(h) for h in raw.get("holdings", [])]
+
+    pre_ipo_sleeve_M = fund_data.get("pre_ipo_sleeve_M")
+    ipo_raise_M = fund_data["ipo_raise_M"]
+
+    # Auto-derive fund_mark_M from weight × pre-IPO sleeve, and ownership_pct
+    # from fund_mark / last_round (a 409A is typically anchored to last round).
+    cash_weight_pct = 0.0
+    if pre_ipo_sleeve_M is not None:
+        holdings_weight_sum = sum(h.weight_pct or 0.0 for h in holdings)
+        cash_weight_pct = max(0.0, 100.0 - holdings_weight_sum)
+        for h in holdings:
+            if h.fund_mark_M is None and h.weight_pct is not None:
+                h.fund_mark_M = (h.weight_pct / 100.0) * pre_ipo_sleeve_M
+            if (
+                h.rvi_ownership_pct is None
+                and h.fund_mark_M is not None
+                and h.last_round_valuation_B
+            ):
+                h.rvi_ownership_pct = (
+                    h.fund_mark_M / (h.last_round_valuation_B * 1000.0)
+                ) * 100.0
+
+    cash_M = fund_data.get("cash_and_equivalents_M")
+    if cash_M is None:
+        if pre_ipo_sleeve_M is not None:
+            cash_M = (cash_weight_pct / 100.0) * pre_ipo_sleeve_M + ipo_raise_M
+        else:
+            cash_M = 0.0
+
     return Fund(
         ticker=fund_data["ticker"],
         name=fund_data["name"],
         inception_date=str(fund_data.get("inception_date", "")),
-        ipo_raise_M=fund_data["ipo_raise_M"],
+        ipo_raise_M=ipo_raise_M,
         ipo_price=fund_data["ipo_price"],
         shares_outstanding_M=fund_data["shares_outstanding_M"],
         market_price=fund_data["market_price"],
         price_as_of=str(fund_data.get("price_as_of", "")),
-        cash_and_equivalents_M=fund_data.get("cash_and_equivalents_M", 0.0) or 0.0,
+        cash_and_equivalents_M=cash_M,
         other_liabilities_M=fund_data.get("other_liabilities_M", 0.0) or 0.0,
         accrued_mgmt_fee_M=fund_data.get("accrued_mgmt_fee_M", 0.0) or 0.0,
         management_fee_pct=fund_data.get("management_fee_pct", 2.0),
